@@ -122,5 +122,94 @@ Le librerie presenti in Python calcolano il percorso su una matrice dove le cell
 <br><br><br>
 <img src="https://user-images.githubusercontent.com/10675526/219768304-c31ba352-34a2-4cef-b550-d370541dd3e7.png" width="600" />
 
+### Meccanismo di funzionamento
+L’Algoritmo A-Star viene avviato dalla funzione “def a_star2(punto_finale, punto_iniziale, mappa_da_convertire)” che:
+- riceve in ingresso lo start point, l’end point e la mappa elaborata dal robot supervisore
+- restituisce la mappa aggiornata che contiene i punti da visitare per andare dallo start point all’end point
+All’interno vengono eseguite le seguenti operazioni:
+- riceve la mappa dove ogni sottolista indica [Visitata, Ovest, Nord, Est, Sud]
+<img src="https://user-images.githubusercontent.com/10675526/219769608-5fbb128f-3adc-4463-954b-fda4e1af16e6.png" width="500"/>
+<br><br><br>
+- vengono applicata una maschera pesi fittizi infiniti verso tutti i percorsi per indicare all’algoritmo che ancora non sono stati presi in esame
+<img src="https://user-images.githubusercontent.com/10675526/219770235-fa000075-021b-47a2-bce9-92b97bb44c14.png" width="500" />
+<br><br><br>
+- viene creata la maze dove righe e colonne dispari indicano i muri fittizi che servono per potere identificare le celle attigue dalle quali non è possibile passare da una all’altra
+<img src="https://user-images.githubusercontent.com/10675526/219771121-9a488ab2-242d-41bd-950f-071c1f8596e4.png" width="500" />
+quindi per una mappa 4x4 la maze avrà una dimensione 7x7, mentre per una mappa 8x8 sarà mappata in una 15x15
+
+- vengono inseriti gli ostacoli reali nella maze:
+[[0, 0, 0, 0, 0, 0, 0],
+[0, 1, 1, 1, 0, 1, 0],
+[0, 1, 0, 1, 0, 1, 0],
+[1, 1, 0, 1, 0, 1, 0],
+[0, 1, 0, 0, 0, 1, 0],
+[0, 1, 1, 1, 0, 1, 0],
+[0, 0, 0, 0, 0, 0, 0]]
+
+- l’algoritmo ASTAR calcola il percorso su quest’ultima lista di liste:
+[[-1, -1, -1, -1, -1, -1, -1],
+[-1, -1, -1, -1, -1, -1, -1],
+[-1, -1, 0, -1, -1, -1, -1],
+[-1, -1, 1, -1, -1, -1, -1],
+[12, -1, 2, 3, 4, -1, -1],
+[11, -1, -1, -1, 5, -1, -1],
+[10, 9, 8, 7, 6, -1, -1]]
+dove il percorso da seguire è dato dai numeri >= 0
+
+- vengono scartati i punti contenenti i muri virtuali, si torna quindi ad una 4x4:
+<img src="https://user-images.githubusercontent.com/10675526/219771992-ce088d67-c5dd-454b-9f29-344ea818a84d.png" width="500" />
+viene ricomposta in una sequenza ordinata:
+[ 
+  [-1,-1,-1,-1], [-1,2,-1,-1], [8,3,4,-1], [7,6,5,-1] 
+]
+
+- viene restituita la grid_maze al controllore, aggironata e contenente come primo elemneto un numero che indica come valore il passaggio nel percorso tra il punto iniziale e finale :
+[
+  [2, 'X', 'X', 0, 0], [3, 0, 'X', 0, 1], [4, 0, 'X', 0, 0], ['inf', 0, 'X', 'X', 0],
+  ['inf', 'X', 0, 1, 1], ['inf', 1, 1, 1, 0], [5, 1, 0, 1, 0], ['inf', 1, 0, 'X', 0],
+  ['inf', 'X', 1, 1, 0], ['inf', 1, 0, 0, 1], [6, 0, 0, 1, 0], ['inf', 1, 0, 'X', 0],
+  ['inf', 'X', 0, 0, 'X'], ['inf', 0, 1, 0, 'X'], [7, 0, 0, 0, 'X'], [8, 0, 0, 'X', 'X'] 
+]
+
+
+### Emitter – Receiver
+Per inviare un pacchetto di dati ai potenziali ricevitori, la funzione wb_emitter_send aggiunge alla coda dell'emettitore un pacchetto di byte di dimensioni pari all'indirizzo indicato da data.
+I pacchetti di dati in coda saranno inviati ai potenziali destinatari (e rimossi dalla coda dell'emettitore) alla velocità specificata dal campo baudRate del nodo Emitter.
+La coda è considerata piena quando la somma dei byte di tutti i pacchetti attualmente in coda supera la dimensione del buffer specificata dal campo bufferSize. 
+In particolare, con Python, la funzione send invia una stringa; in alternativa si possono inviare tipi di dati primitivi in questa stringa con il modulo struct.
+Quindi, nel nostro caso, prevedendo lo scambio di informazioni tra i robot, anche, con:
+- lista di liste
+- array
+si è reso necessario ripensare la struttura dati in un formato del tipo:
+<img src="https://user-images.githubusercontent.com/10675526/219773560-0ff6a235-257b-4191-8af6-4e136c7a8df8.png" width="600" />
+in modo schematico:
+- Lato Emitter:
+<img src="https://user-images.githubusercontent.com/10675526/219774448-29b1f794-0d2a-404f-980e-93fcf32fe928.png" width="600" />
+- Lato Reicever:
+<img src="https://user-images.githubusercontent.com/10675526/219775530-d1f35359-537b-4a3c-ba9c-c81340560d77.png" width="600" />
+
+I messaggi scambiati avranno una struttura del tipo:
+- Lato Supervisore
+<img src="https://user-images.githubusercontent.com/10675526/219778561-c3ec8699-d1d4-4b36-8e3d-7a9ffdd90c5a.png" width="600" />
+<br>
+- Lato Operaio
+<img src="https://user-images.githubusercontent.com/10675526/219779176-93afde2d-64bb-4019-80ee-fa40a8d294b4.png" width="600" />
+<br><br>
+
+###Conclusioni
+Abbiamo raggiunto il nostro obiettivo, creare un ambiente simulato di lavoro dove diversi robot riescono a cooperare per portare avanti un compito comune: la cura della coltura.
+
+È stato possibile realizzarlo grazie all’ideazione di uno scenario dove sono presenti robot specializzati in determinate attività:
+- Robot supervisore
+  - Si localizza e Mappa un ambiente sconosciuto
+  - Definisce i punti del giardino dove intervenire
+  - Contatta via radio i robot operai comunicando i punti di lavoro e il compito da eseguire
+  - 
+- Robot operaio
+  - Riceve via radio l’ambiente di lavoro sul quale operare e il compito da eseguire
+  - Definisce con l’algoritmo A-Star il percorso per arrivare sul punto di lavoro
+  - Esegue il compito nel quale è specializzato
+  - Contatta il robot supervisore per informarlo che ha esaurito il compito
+  - Resta in attesa di ulteriori istruzioni.
 
 
