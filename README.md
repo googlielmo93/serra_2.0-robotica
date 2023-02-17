@@ -74,7 +74,7 @@ modulare per scrivere il codice. Tale scelta è stata presa per garantire:
 - Facilità di identificazione e di correzione dei bug
 - Facilità di inserimento di nuove funzioni
 
-Al nostro codice è stata data una struttura di questo tipo:<br>
+Al nostro codice è stata data una struttura di questo tipo:<br><br>
 <img src="https://user-images.githubusercontent.com/10675526/219764190-fc8602d9-0247-4ae7-a3d1-9e6fecd0e71b.png" width="500"/>
 
 Prevede un file main.py che va a richiamare i diversi moduli a seconda dei compiti che devono essere svolti.
@@ -117,47 +117,49 @@ Siamo, quindi, scesi a un compromesso progettuale che prevede l’utilizzo di un
 Per il nostro progetto si è scelto di non usare librerie già esistenti per Python perché ci si è resi conto che quanto già presente non era adatto al nostro utilizzo.
 Le librerie presenti in Python calcolano il percorso su una matrice dove le celle possono essere considerate o percorribili o non percorribili: <br>
 <img src="https://user-images.githubusercontent.com/10675526/219767382-afc2ae00-3c65-429e-ad58-6af6e1defcc6.png" width="500"/>
-<br><br><br>
+<br>
 <img src="https://user-images.githubusercontent.com/10675526/219767993-fc609220-cde2-46dc-bb41-633dcf0136a0.png" width="600" />
-<br><br><br>
+<br>
 <img src="https://user-images.githubusercontent.com/10675526/219768304-c31ba352-34a2-4cef-b550-d370541dd3e7.png" width="600" />
 
 ### Meccanismo di funzionamento
 L’Algoritmo A-Star viene avviato dalla funzione “def a_star2(punto_finale, punto_iniziale, mappa_da_convertire)” che:
 - riceve in ingresso lo start point, l’end point e la mappa elaborata dal robot supervisore
 - restituisce la mappa aggiornata che contiene i punti da visitare per andare dallo start point all’end point
+
 All’interno vengono eseguite le seguenti operazioni:
 - riceve la mappa dove ogni sottolista indica [Visitata, Ovest, Nord, Est, Sud]
 <img src="https://user-images.githubusercontent.com/10675526/219769608-5fbb128f-3adc-4463-954b-fda4e1af16e6.png" width="500"/>
-<br><br><br>
 - vengono applicata una maschera pesi fittizi infiniti verso tutti i percorsi per indicare all’algoritmo che ancora non sono stati presi in esame
 <img src="https://user-images.githubusercontent.com/10675526/219770235-fa000075-021b-47a2-bce9-92b97bb44c14.png" width="500" />
-<br><br><br>
 - viene creata la maze dove righe e colonne dispari indicano i muri fittizi che servono per potere identificare le celle attigue dalle quali non è possibile passare da una all’altra
-<img src="https://user-images.githubusercontent.com/10675526/219771121-9a488ab2-242d-41bd-950f-071c1f8596e4.png" width="500" />
-quindi per una mappa 4x4 la maze avrà una dimensione 7x7, mentre per una mappa 8x8 sarà mappata in una 15x15
-
+<img src="https://user-images.githubusercontent.com/10675526/219771121-9a488ab2-242d-41bd-950f-071c1f8596e4.png" width="300" />
+quindi per una mappa 4x4 la maze avrà una dimensione 7x7, mentre per una mappa 8x8 sarà mappata in una 15x15<br><br>
 - vengono inseriti gli ostacoli reali nella maze:
-[[0, 0, 0, 0, 0, 0, 0],
-[0, 1, 1, 1, 0, 1, 0],
-[0, 1, 0, 1, 0, 1, 0],
-[1, 1, 0, 1, 0, 1, 0],
-[0, 1, 0, 0, 0, 1, 0],
-[0, 1, 1, 1, 0, 1, 0],
-[0, 0, 0, 0, 0, 0, 0]]
+  [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0, 1, 0],
+    [0, 1, 0, 1, 0, 1, 0],
+    [1, 1, 0, 1, 0, 1, 0],
+    [0, 1, 0, 0, 0, 1, 0],
+    [0, 1, 1, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0]
+  ]
 
 - l’algoritmo ASTAR calcola il percorso su quest’ultima lista di liste:
-[[-1, -1, -1, -1, -1, -1, -1],
-[-1, -1, -1, -1, -1, -1, -1],
-[-1, -1, 0, -1, -1, -1, -1],
-[-1, -1, 1, -1, -1, -1, -1],
-[12, -1, 2, 3, 4, -1, -1],
-[11, -1, -1, -1, 5, -1, -1],
-[10, 9, 8, 7, 6, -1, -1]]
+[
+  [-1, -1, -1, -1, -1, -1, -1],
+  [-1, -1, -1, -1, -1, -1, -1],
+  [-1, -1, 0, -1, -1, -1, -1],
+  [-1, -1, 1, -1, -1, -1, -1],
+  [12, -1, 2, 3, 4, -1, -1],
+  [11, -1, -1, -1, 5, -1, -1],
+  [10, 9, 8, 7, 6, -1, -1]
+]
 dove il percorso da seguire è dato dai numeri >= 0
 
 - vengono scartati i punti contenenti i muri virtuali, si torna quindi ad una 4x4:
-<img src="https://user-images.githubusercontent.com/10675526/219771992-ce088d67-c5dd-454b-9f29-344ea818a84d.png" width="500" />
+<img src="https://user-images.githubusercontent.com/10675526/219771992-ce088d67-c5dd-454b-9f29-344ea818a84d.png" width="150" />
 viene ricomposta in una sequenza ordinata:
 [ 
   [-1,-1,-1,-1], [-1,2,-1,-1], [8,3,4,-1], [7,6,5,-1] 
@@ -193,7 +195,7 @@ I messaggi scambiati avranno una struttura del tipo:
 <img src="https://user-images.githubusercontent.com/10675526/219778561-c3ec8699-d1d4-4b36-8e3d-7a9ffdd90c5a.png" width="600" />
 <br>
 - Lato Operaio
-<img src="https://user-images.githubusercontent.com/10675526/219779176-93afde2d-64bb-4019-80ee-fa40a8d294b4.png" width="600" />
+<img src="https://user-images.githubusercontent.com/10675526/219779176-93afde2d-64bb-4019-80ee-fa40a8d294b4.png" width="500" />
 <br><br>
 
 ###Conclusioni
